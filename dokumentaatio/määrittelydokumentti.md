@@ -23,6 +23,10 @@ Tämän projektin ydin on näiden kolmen reitinhakualgoritmin tehokkuuden arvioi
 ### Lähteet
 
 Lähteinä alustavasti aion käyttää ainakin:
+https://zerowidth.com/2013/a-visual-explanation-of-jump-point-search
+https://users.cecs.anu.edu.au/~dharabor/data/papers/harabor-grastien-aaai11.pdf
+https://www.youtube.com/watch?v=NmM4pv8uQwI
+https://www.youtube.com/watch?v=JtiK0DOeI4A
 
 ### Lisäksi
 
