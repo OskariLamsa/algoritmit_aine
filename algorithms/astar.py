@@ -63,5 +63,5 @@ def algorithm(draw, grid, start, end):
 if __name__ == "__main__":
     from visualizer import Visualizer
 
-    v = Visualizer(width=800, rows=50, caption="a*")
+    v = Visualizer(width=1200, rows=50, caption="a*")
     v.run(algorithm)
