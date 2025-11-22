@@ -38,7 +38,7 @@ def main():
 
     print("\nAvailable maps are:")
     for i in maps:
-        print(f" -{i}")
+        print(f" - {i}")
 
     map_choice = input("Which map do you want to choose? ")
 

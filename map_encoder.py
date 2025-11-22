@@ -3,10 +3,10 @@ from PIL import Image
 import os
 import csv
 
-def main():
+def main(maps_dir_to_set, maps_data_dir_to_set):
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    maps_dir = os.path.join(base_dir, "maps")
-    maps_data = os.path.join(base_dir, "maps_data")
+    maps_dir = os.path.join(base_dir, maps_dir_to_set)
+    maps_data = os.path.join(base_dir, maps_data_dir_to_set)
     if not os.path.isdir(maps_dir):
         print(f"maps directory not found.")
         return
@@ -20,21 +20,21 @@ def main():
     for file in maps_files:
         map_file_path = os.path.join(maps_dir, file)
         if os.path.isfile(map_file_path):
-            json_name = file[0:-4] + ".csv"
-            if json_name in maps_data_files:
-                print(f"{json_name} exists in maps_data!")
+            csv_name = file[0:-4] + ".csv"
+            if csv_name in maps_data_files:
+                print(f"{csv_name} exists in maps_data!")
             else:
-                print(f"{json_name} is missing from maps_data")
-                maps_data_encoder(json_name, map_file_path, maps_dir, maps_data)
+                print(f"{csv_name} is missing from maps_data")
+                maps_data_encoder(csv_name, map_file_path, maps_dir, maps_data)
                 
-def maps_data_encoder(json_name, map_file_path, maps_dir, maps_data):
+def maps_data_encoder(csv_name, map_file_path, maps_dir, maps_data):
     #Ottaa maps ja maps_data kirjastot, kuvan nimen, ja halutun map_data-tiedoston nimen.
-    #Ei palauta mitään, mutta kirjoittaa maps_data-kansioon json tiedoston.
+    #Ei palauta mitään, mutta kirjoittaa maps_data-kansioon .csv tiedoston.
     black_pixels_array = pixel_reader(os.path.join(maps_dir, map_file_path))
-    with open(os.path.join(maps_data, json_name), "w") as f:
+    with open(os.path.join(maps_data, csv_name), "w") as f:
         writer = csv.writer(f, delimiter=';')
         writer.writerows(black_pixels_array)
-        print(f"Wrote {json_name} in {maps_data}!")
+        print(f"Wrote {csv_name} in {maps_data}!")
 
 
 def pixel_reader(file_path):
@@ -54,4 +54,4 @@ def pixel_reader(file_path):
 
 
 if __name__ == "__main__":
-    main()
+    main("maps", "maps_data")

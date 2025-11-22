@@ -109,15 +109,17 @@ class Visualizer:
     def __init__(self, width=800, rows=50, caption="No name given.", map_data=None):
         if map_data == None:
             print("debug: I am visualizer, and I did not get map_data.")
+            self.rows = rows
         else:
             print("debug: I am visualizer, and I received map_data.")
+            self.rows = int(map_data[0][0])
+
         pygame.init()
         self.width = width
-        self.rows = rows
         self.win = pygame.display.set_mode((width, width))
         pygame.display.set_caption(caption)
 
-        self.grid = self.make_grid(rows, width)
+        self.grid = self.make_grid(self.rows, width)
         self.start = None
         self.end = None
 
@@ -125,6 +127,11 @@ class Visualizer:
         self._render_background()
         self._dirty_rects = set()
         self._initial_drawn = False
+        self._draw_map_barriers(map_data)
+    def _draw_map_barriers(self, map_data):
+        for i in map_data[1:]:
+            spot = self.grid[i[0]][i[1]]
+            spot.make_barrier()
 
     def _render_background(self):
         self.background.fill(WHITE)
@@ -247,5 +254,5 @@ if __name__ == "__main__":
     except Exception:
         algorithm = lambda draw, grid, start, end: None
 
-    v = Visualizer(width=1200, rows=250, caption="Incremental Visualizer Demo")
+    v = Visualizer(width=800, rows=250, caption="Incremental Visualizer Demo")
     v.run(algorithm)
