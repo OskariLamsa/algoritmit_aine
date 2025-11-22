@@ -106,7 +106,11 @@ class Spot:
 
 
 class Visualizer:
-    def __init__(self, width=800, rows=50, caption="No name given."):
+    def __init__(self, width=800, rows=50, caption="No name given.", map_data=None):
+        if map_data == None:
+            print("debug: I am visualizer, and I did not get map_data.")
+        else:
+            print("debug: I am visualizer, and I received map_data.")
         pygame.init()
         self.width = width
         self.rows = rows
@@ -124,12 +128,6 @@ class Visualizer:
 
     def _render_background(self):
         self.background.fill(WHITE)
-        gap = self.width // self.rows
-        for i in range(self.rows):
-            pygame.draw.line(self.background, GREY, (0, i * gap), (self.width, i * gap))
-            for j in range(self.rows):
-                pygame.draw.line(self.background, GREY, (j * gap, 0), (j * gap, self.width))
-
     def make_grid(self, rows, width):
         grid = []
         gap = width // rows
@@ -164,11 +162,12 @@ class Visualizer:
             src_rect = pygame.Rect(x, y, w, h)
             self.win.blit(self.background, (x, y), src_rect)
             rects_to_update.append(src_rect)
-            row = x // (self.width // self.rows)
-            col = y // (self.width // self.rows)
+            
+            # Calculate which spot this dirty rect belongs to
             gap = self.width // self.rows
-            r = x // gap
-            c = y // gap
+            r = min(x // gap, self.rows - 1)
+            c = min(y // gap, self.rows - 1)
+            
             if 0 <= r < self.rows and 0 <= c < self.rows:
                 self.grid[r][c].draw(self.win)
 
@@ -178,9 +177,9 @@ class Visualizer:
 
     def get_clicked_pos(self, pos):
         gap = self.width // self.rows
-        y, x = pos
-        row = y // gap
-        col = x // gap
+        x, y = pos
+        row = min(x // gap, self.rows -1)
+        col = min(y // gap, self.rows -1)
         return row, col
 
     def reset_grid(self):
@@ -197,6 +196,8 @@ class Visualizer:
     def run(self, algorithm_callable):
         run = True
         clock = pygame.time.Clock()
+        spot = self.grid[249][249]
+        spot.make_end()
         while run:
             clock.tick(120)
             self.draw()
@@ -246,5 +247,5 @@ if __name__ == "__main__":
     except Exception:
         algorithm = lambda draw, grid, start, end: None
 
-    v = Visualizer(width=800, rows=50, caption="Incremental Visualizer Demo")
+    v = Visualizer(width=1200, rows=250, caption="Incremental Visualizer Demo")
     v.run(algorithm)

@@ -44,6 +44,7 @@ def pixel_reader(file_path):
     pixels = img.load()
     width, height = img.size
     black_pixels_array = []
+    black_pixels_array.append((width, height))
     for i in range(height):
         for j in range(width):
             r, g, b = pixels[j, i]

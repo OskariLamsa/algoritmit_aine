@@ -1,5 +1,5 @@
 from queue import PriorityQueue
-
+from time import sleep
 
 def h(p1, p2):
     #Manhattan distance -tyylinen heuristiikka
@@ -51,7 +51,7 @@ def algorithm(draw, grid, start, end):
                     open_set.put((f_score[neighbor], count, neighbor))
                     open_set_hash.add(neighbor)
                     neighbor.make_open()
-
+        #sleep(0.03)
         draw()
 
         if current != start:
@@ -61,7 +61,16 @@ def algorithm(draw, grid, start, end):
 
 
 if __name__ == "__main__":
+    import sys
     from visualizer import Visualizer
-
-    v = Visualizer(width=1200, rows=50, caption="a*")
+    from map_loader import map_loader
+    map_data = None
+    if len(sys.argv) < 2:
+        print("Called astar without a map file. Defaulting to empty map.")
+    else:
+        print("Called astar with map_data" \
+        "")
+        map_data = sys.argv[1]
+        map_data = map_loader(map_data)
+    v = Visualizer(width=1200, rows=250, caption="a*", map_data=map_data)
     v.run(algorithm)

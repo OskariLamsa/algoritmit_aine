@@ -1,5 +1,6 @@
 import os
 import runpy
+import sys
 
 def list_algorithms():
     path = os.path.join(os.path.dirname(__file__), "algorithms")
@@ -12,24 +13,40 @@ def list_algorithms():
 
     return algorithms
 
+def list_maps():
+    path = os.path.join(os.path.dirname(__file__), "maps_data")
+    files = os.listdir(path)
+    maps = [
+        f[:-4] for f in files
+        if f.endswith(".csv")
+    ]
+    return maps
+
 
 def main():
     algorithms = list_algorithms()
-
+    maps = list_maps()
     print("Available algorithms:")
-    for alg in algorithms:
-        print(f" - {alg}")
+    for i in algorithms:
+        print(f" - {i}")
 
-    choice = input("\nWhich algorithm do you want to run? ")
+    algo_choice = input("\nWhich algorithm do you want to run? ")
 
-    if choice not in algorithms:
-        print(f"Error: '{choice}' is not a valid algorithm.")
+    if algo_choice not in algorithms:
+        print(f"Error: '{algo_choice}' is not a valid algorithm.")
         return
 
-    print(f"\nRunning algorithms.{choice}...\n")
+    print("\nAvailable maps are:")
+    for i in maps:
+        print(f" -{i}")
 
-    # Run as a module so __name__ == '__main__' inside the file
-    runpy.run_module(f"algorithms.{choice}", run_name="__main__")
+    map_choice = input("Which map do you want to choose? ")
+
+    if map_choice not in maps:
+        print(f"Error. {map_choice} is not a valid map name.")
+        return
+    sys.argv = ["", map_choice + ".csv"]
+    runpy.run_module(f"algorithms.{algo_choice}", run_name="__main__")
 
 
 if __name__ == "__main__":
