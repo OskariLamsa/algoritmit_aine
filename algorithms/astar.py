@@ -72,5 +72,5 @@ if __name__ == "__main__":
         "")
         map_data = sys.argv[1]
         map_data = map_loader(map_data)
-    v = Visualizer(width=800, rows=250, caption="a*", map_data=map_data)
+    v = Visualizer(width=1100, rows=250, caption="a*", map_data=map_data)
     v.run(algorithm)

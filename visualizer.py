@@ -185,8 +185,8 @@ class Visualizer:
     def get_clicked_pos(self, pos):
         gap = self.width // self.rows
         x, y = pos
-        row = min(x // gap, self.rows -1)
-        col = min(y // gap, self.rows -1)
+        row = x // gap
+        col = y // gap
         return row, col
 
     def reset_grid(self):
@@ -203,8 +203,6 @@ class Visualizer:
     def run(self, algorithm_callable):
         run = True
         clock = pygame.time.Clock()
-        spot = self.grid[249][249]
-        spot.make_end()
         while run:
             clock.tick(120)
             self.draw()
