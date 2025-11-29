@@ -19,8 +19,8 @@ class Spot:
     def __init__(self, row, col, width, total_rows):
         self.row = row
         self.col = col
-        self.x = row * width
-        self.y = col * width
+        self.x = col * width
+        self.y = row * width
         self.color = WHITE
         self.neighbors = []
         self.width = width
@@ -39,6 +39,8 @@ class Spot:
 
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.width, self.width)
+    def is_empty(self):
+        return self.color == WHITE
 
     def is_closed(self):
         return self.color == RED
@@ -131,7 +133,66 @@ class Spot:
         for drow, dcol in directions:
             if self.is_valid_and_walkable(grid, drow, dcol):
                 self.neighbors.append(self.get_neighbor(grid, drow, dcol))
-
+    def get_forced_neighbor_directions(self, grid, drow, dcol):
+        """Returns list of forced neighbor directions"""
+        forced = []
+        
+        # Horizontal movement
+        if drow == 0 and dcol != 0:
+            if (not self.is_valid_and_walkable(grid, -1, 0) and 
+                self.is_valid_and_walkable(grid, -1, dcol)):
+                forced.append((-1, dcol))
+            if (not self.is_valid_and_walkable(grid, 1, 0) and 
+                self.is_valid_and_walkable(grid, 1, dcol)):
+                forced.append((1, dcol))
+        
+        # Vertical movement
+        elif dcol == 0 and drow != 0:
+            if (not self.is_valid_and_walkable(grid, 0, -1) and 
+                self.is_valid_and_walkable(grid, drow, -1)):
+                forced.append((drow, -1))
+            if (not self.is_valid_and_walkable(grid, 0, 1) and 
+                self.is_valid_and_walkable(grid, drow, 1)):
+                forced.append((drow, 1))
+        
+        # Diagonal up-right
+        elif drow == -1 and dcol == 1:
+            if (not self.is_valid_and_walkable(grid, 0, -1) and 
+                self.is_valid_and_walkable(grid, -1, -1)):
+                forced.append((-1, -1))
+            if (not self.is_valid_and_walkable(grid, 1, 0) and 
+                self.is_valid_and_walkable(grid, 1, 1)):
+                forced.append((1, 1))
+        
+        # Diagonal up-left
+        elif drow == -1 and dcol == -1:
+            if (not self.is_valid_and_walkable(grid, 0, 1) and 
+                self.is_valid_and_walkable(grid, -1, 1)):
+                forced.append((-1, 1))
+            if (not self.is_valid_and_walkable(grid, 1, 0) and 
+                self.is_valid_and_walkable(grid, 1, -1)):
+                forced.append((1, -1))
+        
+        # Diagonal down-right
+        elif drow == 1 and dcol == 1:
+            if (not self.is_valid_and_walkable(grid, 0, -1) and 
+                self.is_valid_and_walkable(grid, 1, -1)):
+                forced.append((1, -1))
+            if (not self.is_valid_and_walkable(grid, -1, 0) and 
+                self.is_valid_and_walkable(grid, -1, 1)):
+                forced.append((-1, 1))
+        
+        # Diagonal down-left
+        elif drow == 1 and dcol == -1:
+            if (not self.is_valid_and_walkable(grid, 0, 1) and 
+                self.is_valid_and_walkable(grid, 1, 1)):
+                forced.append((1, 1))
+            if (not self.is_valid_and_walkable(grid, -1, 0) and 
+                self.is_valid_and_walkable(grid, -1, -1)):
+                forced.append((-1, -1))
+        
+        return forced
+    """
     def detect_forced_neighbors(self, grid, drow, dcol):
         # Tarkistaa pakotetut naapurit, ottaen huomioon liikkumissuunnan
         # Horisontaali liike
@@ -183,7 +244,7 @@ class Spot:
                 self.is_valid_and_walkable(grid, -1, -1)):
                 return True
         return False
-            
+    """            
     def __lt__(self, other):
         return False
 
@@ -196,8 +257,6 @@ class Visualizer:
         else:
             print("debug: I am visualizer, and I received map_data.")
             self.rows = int(map_data[0][0])
-            self._draw_map_barriers(map_data)
-
         pygame.init()
         self.width = width
         self.win = pygame.display.set_mode((width, width))
@@ -211,7 +270,7 @@ class Visualizer:
         self._render_background()
         self._dirty_rects = set()
         self._initial_drawn = False
-
+        self._draw_map_barriers(map_data)
 
     def _draw_map_barriers(self, map_data):
         for i in map_data[1:]:
@@ -220,6 +279,7 @@ class Visualizer:
 
     def _render_background(self):
         self.background.fill(WHITE)
+
     def make_grid(self, rows, width):
         grid = []
         gap = width // rows
@@ -256,8 +316,8 @@ class Visualizer:
             rects_to_update.append(src_rect)
             
             gap = self.width // self.rows
-            r = min(x // gap, self.rows - 1)
-            c = min(y // gap, self.rows - 1)
+            r = min(y // gap, self.rows - 1)
+            c = min(x // gap, self.rows - 1)
             
             if 0 <= r < self.rows and 0 <= c < self.rows:
                 self.grid[r][c].draw(self.win)
@@ -303,13 +363,13 @@ class Visualizer:
                         if not self.start and spot != self.end:
                             self.start = spot
                             self.start.make_start()
-                            sleep(0.3)
                         elif not self.end and spot != self.start:
                             self.end = spot
                             self.end.make_end()
-                            sleep(0.3)
                         elif spot != self.end and spot != self.start:
                             spot.make_barrier()
+                    else:
+                        print(f"OUT OF BOUNDS! row={row}, col={col}, self.rows={self.rows}")
 
                 elif pygame.mouse.get_pressed()[2]:  # Oikea hiirinäppäin
                     pos = pygame.mouse.get_pos()
