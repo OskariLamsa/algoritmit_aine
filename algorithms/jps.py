@@ -116,7 +116,6 @@ def algorithm(draw, grid, start, end):
                         open_set.put((f_score[jump_point], count, jump_point))
                         open_set_hash.add(jump_point)
                         jump_point.make_open()
-        sleep(2)
         draw()
 
         if current != start:
