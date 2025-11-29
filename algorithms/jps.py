@@ -46,7 +46,8 @@ def jump(current, direction, grid, draw):
         if next_node.is_end():
             return next_node, distance, []
         
-        next_node.make_jump()
+        if next_node.is_empty():
+            next_node.make_jump()
 
         # Palauta, jos löytyy pakotettu naapuri 
         #if next_node.detect_forced_neighbors(grid, drow, dcol):
@@ -98,14 +99,22 @@ def algorithm(draw, grid, start, end):
         if current in came_from:
             parent, parent_dir = came_from[current]
             valid_directions = get_pruned_directions(parent_dir)
-            if hasattr(parent, 'forced_neighbors') and parent.forced_neighbors:
-                valid_directions.extend(current.forced_neighbors)
+            if hasattr(current, 'forced_neighbors') and current.forced_neighbors:
+                for i in current.forced_neighbors:
+                    if i not in valid_directions:
+                        valid_directions.append(i)
         else:
             # Kaikki suunnat, jos olet aloitus-spotissa
             valid_directions = [(1,1), (1,-1), (1,0), (0,1), (0,-1), (-1,1), (-1,0), (-1,-1),]
         for direction in valid_directions:
             jump_point, jump_distance, forced_list = jump(current, direction, grid, draw)
             if jump_point is not None:
+                if forced_list:
+                    print(f"I saw forced neigbors! {jump_point.get_pos()}: {forced_list}")
+                    jump_point.forced_neighbors = list(forced_list)
+                else:
+                    jump_point.forced_neighbors = []
+
                 temp_g_score = g_score[current] + jump_distance
                 if temp_g_score < g_score[jump_point]:
                     came_from[jump_point] = (current, direction)
@@ -116,7 +125,6 @@ def algorithm(draw, grid, start, end):
                         open_set.put((f_score[jump_point], count, jump_point))
                         open_set_hash.add(jump_point)
                         jump_point.make_open()
-        sleep(2)
         draw()
 
         if current != start:

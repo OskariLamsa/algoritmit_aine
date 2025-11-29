@@ -270,7 +270,8 @@ class Visualizer:
         self._render_background()
         self._dirty_rects = set()
         self._initial_drawn = False
-        self._draw_map_barriers(map_data)
+        if map_data is not None:
+            self._draw_map_barriers(map_data)
 
     def _draw_map_barriers(self, map_data):
         for i in map_data[1:]:
