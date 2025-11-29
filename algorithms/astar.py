@@ -1,12 +1,21 @@
 from queue import PriorityQueue
 from time import sleep
+from math import sqrt
 
 def h(p1, p2):
     #Manhattan distance -tyylinen heuristiikka
     x1, y1 = p1
     x2, y2 = p2
     return abs(x1 - x2) + abs(y1 - y2)
-
+"""
+def h(p1, p2):
+    #Eucdlidian distance -kokeilu
+    x1, y1 = p1
+    x2, y2 = p2
+    x_distance = abs(x1 - x2)
+    y_distance = abs(y1 - y2)
+    return max(x_distance,y_distance) + (0.5)*min(x_distance, y_distance)
+"""
 
 def reconstruct_path(came_from, current, draw):
     while current in came_from:
@@ -67,10 +76,13 @@ if __name__ == "__main__":
     map_data = None
     if len(sys.argv) < 2:
         print("Called astar without a map file. Defaulting to empty map.")
+        custom_rows = int(input("How big would you like the grid to be? "))
+        v = Visualizer(width=1100, rows=custom_rows, caption="a*", map_data=map_data)
+        v.run(algorithm)
     else:
         print("Called astar with map_data" \
         "")
         map_data = sys.argv[1]
         map_data = map_loader(map_data)
-    v = Visualizer(width=1100, rows=250, caption="a*", map_data=map_data)
-    v.run(algorithm)
+        v = Visualizer(width=1100, rows=250, caption="a*", map_data=map_data)
+        v.run(algorithm)

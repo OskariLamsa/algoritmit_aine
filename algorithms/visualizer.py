@@ -19,8 +19,8 @@ class Spot:
     def __init__(self, row, col, width, total_rows):
         self.row = row
         self.col = col
-        self.x = row * width
-        self.y = col * width
+        self.x = col * width  # ← Use col for X (horizontal)
+        self.y = row * width  # ← Use row for Y (vertical)
         self.color = WHITE
         self.neighbors = []
         self.width = width
@@ -131,7 +131,65 @@ class Spot:
         for drow, dcol in directions:
             if self.is_valid_and_walkable(grid, drow, dcol):
                 self.neighbors.append(self.get_neighbor(grid, drow, dcol))
-
+    def get_forced_neighbor_directions(self, grid, drow, dcol):
+        """Returns list of forced neighbor directions"""
+        forced = []
+        
+        # Horizontal movement
+        if drow == 0 and dcol != 0:
+            if (not self.is_valid_and_walkable(grid, -1, 0) and 
+                self.is_valid_and_walkable(grid, -1, dcol)):
+                forced.append((-1, dcol))
+            if (not self.is_valid_and_walkable(grid, 1, 0) and 
+                self.is_valid_and_walkable(grid, 1, dcol)):
+                forced.append((1, dcol))
+        
+        # Vertical movement
+        elif dcol == 0 and drow != 0:
+            if (not self.is_valid_and_walkable(grid, 0, -1) and 
+                self.is_valid_and_walkable(grid, drow, -1)):
+                forced.append((drow, -1))
+            if (not self.is_valid_and_walkable(grid, 0, 1) and 
+                self.is_valid_and_walkable(grid, drow, 1)):
+                forced.append((drow, 1))
+        
+        # Diagonal up-right
+        elif drow == -1 and dcol == 1:
+            if (not self.is_valid_and_walkable(grid, 0, -1) and 
+                self.is_valid_and_walkable(grid, -1, -1)):
+                forced.append((-1, -1))
+            if (not self.is_valid_and_walkable(grid, 1, 0) and 
+                self.is_valid_and_walkable(grid, 1, 1)):
+                forced.append((1, 1))
+        
+        # Diagonal up-left
+        elif drow == -1 and dcol == -1:
+            if (not self.is_valid_and_walkable(grid, 0, 1) and 
+                self.is_valid_and_walkable(grid, -1, 1)):
+                forced.append((-1, 1))
+            if (not self.is_valid_and_walkable(grid, 1, 0) and 
+                self.is_valid_and_walkable(grid, 1, -1)):
+                forced.append((1, -1))
+        
+        # Diagonal down-right
+        elif drow == 1 and dcol == 1:
+            if (not self.is_valid_and_walkable(grid, 0, -1) and 
+                self.is_valid_and_walkable(grid, 1, -1)):
+                forced.append((1, -1))
+            if (not self.is_valid_and_walkable(grid, -1, 0) and 
+                self.is_valid_and_walkable(grid, -1, 1)):
+                forced.append((-1, 1))
+        
+        # Diagonal down-left
+        elif drow == 1 and dcol == -1:
+            if (not self.is_valid_and_walkable(grid, 0, 1) and 
+                self.is_valid_and_walkable(grid, 1, 1)):
+                forced.append((1, 1))
+            if (not self.is_valid_and_walkable(grid, -1, 0) and 
+                self.is_valid_and_walkable(grid, -1, -1)):
+                forced.append((-1, -1))
+        
+        return forced
     def detect_forced_neighbors(self, grid, drow, dcol):
         # Tarkistaa pakotetut naapurit, ottaen huomioon liikkumissuunnan
         # Horisontaali liike
@@ -256,8 +314,8 @@ class Visualizer:
             rects_to_update.append(src_rect)
             
             gap = self.width // self.rows
-            r = min(x // gap, self.rows - 1)
-            c = min(y // gap, self.rows - 1)
+            r = min(y // gap, self.rows - 1)
+            c = min(x // gap, self.rows - 1)
             
             if 0 <= r < self.rows and 0 <= c < self.rows:
                 self.grid[r][c].draw(self.win)
@@ -287,6 +345,16 @@ class Visualizer:
     def run(self, algorithm_callable):
         run = True
         clock = pygame.time.Clock()
+        """
+        spot = self.grid[0][0]
+        spot.make_start()
+        spot = self.grid[0][9]
+        spot.make_barrier()
+        spot = self.grid[9][9]
+        spot.make_end()
+        spot = self.grid[9][0]
+        spot.make_closed()
+        """
         while run:
             clock.tick(120)
             self.draw()
@@ -303,13 +371,13 @@ class Visualizer:
                         if not self.start and spot != self.end:
                             self.start = spot
                             self.start.make_start()
-                            sleep(0.3)
                         elif not self.end and spot != self.start:
                             self.end = spot
                             self.end.make_end()
-                            sleep(0.3)
                         elif spot != self.end and spot != self.start:
                             spot.make_barrier()
+                    else:
+                        print(f"OUT OF BOUNDS! row={row}, col={col}, self.rows={self.rows}")
 
                 elif pygame.mouse.get_pressed()[2]:  # Oikea hiirinäppäin
                     pos = pygame.mouse.get_pos()

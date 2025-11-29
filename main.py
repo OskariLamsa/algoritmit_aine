@@ -40,8 +40,10 @@ def main():
     for i in maps:
         print(f" - {i}")
 
-    map_choice = input("Which map do you want to choose? ")
-
+    print("Which map do you want to choose? ")
+    map_choice = input(f"You can also type \"custom\" to draw your own map. ")
+    if map_choice == "custom":
+        runpy.run_module(f"algorithms.{algo_choice}", run_name="__main__")
     if map_choice not in maps:
         print(f"Error. {map_choice} is not a valid map name.")
         return
