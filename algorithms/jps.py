@@ -91,7 +91,7 @@ def algorithm(draw, grid, start, end):
     while not open_set.empty():
         current = open_set.get()[2]
         open_set_hash.remove(current)
-
+        sleep(2)
         if current == end:
             reconstruct_path(came_from, end, draw)
             end.make_end()
