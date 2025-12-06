@@ -1,5 +1,5 @@
 from queue import PriorityQueue
-from time import sleep
+import time
 from math import sqrt
 
 def h(p1, p2):
@@ -26,6 +26,7 @@ def reconstruct_path(came_from, current, draw):
 
 def algorithm(draw, grid, start, end):
     # a* algoritmi
+    start_time = time.time()
     count = 0
     open_set = PriorityQueue()
     open_set.put((0, count, start))
@@ -46,6 +47,8 @@ def algorithm(draw, grid, start, end):
         if current == end:
             reconstruct_path(came_from, end, draw)
             end.make_end()
+            end_time = time.time()
+            print(f"Resolved in {end_time - start_time} seconds")
             return True
 
         for neighbor in current.neighbors:

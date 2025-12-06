@@ -116,7 +116,7 @@ class Spot:
         if 0 <= new_row < self.total_rows and 0 <= new_col < self.total_rows:
             return grid[new_row][new_col]
         return None
-    """
+
     def update_neighbors(self, grid):
         self.neighbors = []
         directions = [
@@ -128,16 +128,6 @@ class Spot:
             (1, -1),  # Alas-vasen
             (-1, 1),  # Ylös-oikea
             (-1, -1)  # Ylös-vasen
-        ]
-    """
-    def update_neighbors(self, grid):
-        # Käytä tätä, kun ajat Astar
-        self.neighbors = []
-        directions = [
-            (1, 0), # Alas
-            (-1, 0), # Ylös
-            (0, 1), # Oikea
-            (0, -1) # Vasen
         ]
         
         for drow, dcol in directions:
