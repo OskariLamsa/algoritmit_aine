@@ -7,15 +7,7 @@ def h(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
     return abs(x1 - x2) + abs(y1 - y2)
-"""
-def h(p1, p2):
-    #Eucdlidian distance -kokeilu
-    x1, y1 = p1
-    x2, y2 = p2
-    x_distance = abs(x1 - x2)
-    y_distance = abs(y1 - y2)
-    return max(x_distance,y_distance) + (0.5)*min(x_distance, y_distance)
-"""
+
 
 def reconstruct_path(came_from, current, draw):
     while current in came_from:
@@ -32,7 +24,7 @@ def algorithm(draw, grid, start, end):
     open_set.put((0, count, start))
     came_from = {}
 
-    # algoritmin alussa asetetaan jokaisen pikselin g- ja f-arvoksi loputon.
+    # algoritmin alussa asetetaan jokaisen noden g- ja f-arvoksi loputon.
     g_score = {pixel: float("inf") for row in grid for pixel in row}
     g_score[start] = 0
     f_score = {pixel: float("inf") for row in grid for pixel in row}

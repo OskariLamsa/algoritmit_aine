@@ -92,13 +92,6 @@ class Spot:
     def draw(self, surface):
         surface.fill(self.color, self.get_rect())
 
-    def check_barrier(self, grid, direction):
-        match direction:
-            case "right":
-                if self.col < self.total_rows - 1 and grid[self.row][self.col + 1].is_barrier():
-                    return True
-            case _:
-                return False
     def is_valid_and_walkable(self, grid, drow, dcol):
         # Tarkista, onko haluttu paikka ruudukon sisällä, ja onko se valkoinen, tai maali
         new_row = self.row + drow
@@ -116,20 +109,7 @@ class Spot:
         if 0 <= new_row < self.total_rows and 0 <= new_col < self.total_rows:
             return grid[new_row][new_col]
         return None
-    """
-    def update_neighbors(self, grid):
-        self.neighbors = []
-        directions = [
-            (1, 0),   # Alas
-            (-1, 0),  # Ylös
-            (0, 1),   # Oikea
-            (0, -1),  # Vasen
-            (1, 1),   # Alas-oikea
-            (1, -1),  # Alas-vasen
-            (-1, 1),  # Ylös-oikea
-            (-1, -1)  # Ylös-vasen
-        ]
-    """
+    
     def update_neighbors(self, grid):
         # Käytä tätä, kun ajat Astar
         self.neighbors = []
@@ -143,119 +123,6 @@ class Spot:
         for drow, dcol in directions:
             if self.is_valid_and_walkable(grid, drow, dcol):
                 self.neighbors.append(self.get_neighbor(grid, drow, dcol))
-    def get_forced_neighbor_directions(self, grid, drow, dcol):
-        """Returns list of forced neighbor directions"""
-        forced = []
-        
-        # Horizontal movement
-        if drow == 0 and dcol != 0:
-            if (not self.is_valid_and_walkable(grid, -1, 0) and 
-                self.is_valid_and_walkable(grid, -1, dcol)):
-                forced.append((-1, dcol))
-            if (not self.is_valid_and_walkable(grid, 1, 0) and 
-                self.is_valid_and_walkable(grid, 1, dcol)):
-                forced.append((1, dcol))
-        
-        # Vertical movement
-        elif dcol == 0 and drow != 0:
-            if (not self.is_valid_and_walkable(grid, 0, -1) and 
-                self.is_valid_and_walkable(grid, drow, -1)):
-                forced.append((drow, -1))
-            if (not self.is_valid_and_walkable(grid, 0, 1) and 
-                self.is_valid_and_walkable(grid, drow, 1)):
-                forced.append((drow, 1))
-        
-        # Diagonal up-right
-        elif drow == -1 and dcol == 1:
-            if (not self.is_valid_and_walkable(grid, 0, -1) and 
-                self.is_valid_and_walkable(grid, -1, -1)):
-                forced.append((-1, -1))
-            if (not self.is_valid_and_walkable(grid, 1, 0) and 
-                self.is_valid_and_walkable(grid, 1, 1)):
-                forced.append((1, 1))
-        
-        # Diagonal up-left
-        elif drow == -1 and dcol == -1:
-            if (not self.is_valid_and_walkable(grid, 0, 1) and 
-                self.is_valid_and_walkable(grid, -1, 1)):
-                forced.append((-1, 1))
-            if (not self.is_valid_and_walkable(grid, 1, 0) and 
-                self.is_valid_and_walkable(grid, 1, -1)):
-                forced.append((1, -1))
-        
-        # Diagonal down-right
-        elif drow == 1 and dcol == 1:
-            if (not self.is_valid_and_walkable(grid, 0, -1) and 
-                self.is_valid_and_walkable(grid, 1, -1)):
-                forced.append((1, -1))
-            if (not self.is_valid_and_walkable(grid, -1, 0) and 
-                self.is_valid_and_walkable(grid, -1, 1)):
-                forced.append((-1, 1))
-        
-        # Diagonal down-left
-        elif drow == 1 and dcol == -1:
-            if (not self.is_valid_and_walkable(grid, 0, 1) and 
-                self.is_valid_and_walkable(grid, 1, 1)):
-                forced.append((1, 1))
-            if (not self.is_valid_and_walkable(grid, -1, 0) and 
-                self.is_valid_and_walkable(grid, -1, -1)):
-                forced.append((-1, -1))
-        
-        return forced
-
-    def detect_forced_neighbors(self, grid, drow, dcol):
-        # Tarkistaa pakotetut naapurit, ottaen huomioon liikkumissuunnan
-        # Horisontaali liike
-        if drow == 0 and dcol != 0:
-            if (not self.is_valid_and_walkable(grid, -1, 0) and 
-                self.is_valid_and_walkable(grid, -1, dcol)):
-                return True
-            if (not self.is_valid_and_walkable(grid, 1, 0) and 
-                self.is_valid_and_walkable(grid, 1, dcol)):
-                return True
-        # Vertikaali liike
-        elif dcol == 0 and drow != 0:
-            if (not self.is_valid_and_walkable(grid, 0, -1) and 
-                self.is_valid_and_walkable(grid, drow, -1)):
-                return True
-            if (not self.is_valid_and_walkable(grid, 0, 1) and 
-                self.is_valid_and_walkable(grid, drow, 1)):
-                return True
-        """
-        # Diagonaal ylös-oikealle
-        elif drow == -1 and dcol == 1:
-            if (not self.is_valid_and_walkable(grid, 0, -1) and 
-                self.is_valid_and_walkable(grid, -1, -1)):
-                return True
-            if (not self.is_valid_and_walkable(grid, 1, 0) and 
-                self.is_valid_and_walkable(grid, 1, 1)):
-                return True
-        # Diagonaali ylös-vasemmalle
-        elif drow == -1 and dcol == -1:
-            if (not self.is_valid_and_walkable(grid, 0, 1) and 
-                self.is_valid_and_walkable(grid, -1, 1)):
-                return True
-            if (not self.is_valid_and_walkable(grid, 1, 0) and 
-                self.is_valid_and_walkable(grid, 1, -1)):
-                return True
-        # Diagonaali alas-oikealle
-        elif drow == 1 and dcol == 1:
-            if (not self.is_valid_and_walkable(grid, 0, -1) and 
-                self.is_valid_and_walkable(grid, 1, -1)):
-                return True
-            if (not self.is_valid_and_walkable(grid, -1, 0) and 
-                self.is_valid_and_walkable(grid, -1, 1)):
-                return True
-        # Diagonaali alas-vasemalle
-        elif drow == 1 and dcol == -1:
-            if (not self.is_valid_and_walkable(grid, 0, 1) and 
-                self.is_valid_and_walkable(grid, 1, 1)):
-                return True
-            if (not self.is_valid_and_walkable(grid, -1, 0) and 
-                self.is_valid_and_walkable(grid, -1, -1)):
-                return True
-        """
-        return False
           
     def __lt__(self, other):
         return False
@@ -264,10 +131,8 @@ class Spot:
 class Visualizer:
     def __init__(self, width=800, rows=50, caption="No name given.", map_data=None):
         if map_data == None:
-            print("debug: I am visualizer, and I did not get map_data.")
             self.rows = rows
         else:
-            print("debug: I am visualizer, and I received map_data.")
             self.rows = int(map_data[0][0])
         pygame.init()
         self.width = width
