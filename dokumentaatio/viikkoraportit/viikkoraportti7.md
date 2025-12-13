@@ -1,0 +1,4 @@
+### Viikkoraportti 7
+Tällä viikolla muutin visualizer-luokkaa siten, että nyt käyttäjä voi ajaa kaikki algoritmit yhdellä kartalla. Tämä tapahtuu kirjoittamalla algoritmivalinnaksi "all". Jos tekisin kolmannen algoritmin, sen voisi sijoittaa lisäksi aika helposti. Lisäksi olen laajentanut testausta. Nyt testaamme map_loader, map_encoder, astar ja jps -tiedostoja. Suurin osa tämän viikon työstä meni miettimiseen, miten näitä funktioita voidaan kutsua oikein testeissä. Olisi varmaan ollut fiksumpaa miettiä näiden funktioiden kirjoitusaikana näitä testejä. Esimerkiksi, tällä hetkellä en osaa kutsua algoritmieni algorithm-funktioita suoraan. Sen sijaan testaan niitä Visualizer-luokan kautta.
+
+Tällä viikolla käytin 15 tuntia projektiin

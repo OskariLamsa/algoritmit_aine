@@ -1,7 +1,7 @@
 from queue import PriorityQueue
 import time
 def h(p1, p2):
-    #Eucdlidian distance heuristiikka
+    #Octile distance heuristiikka
     x1, y1 = p1
     x2, y2 = p2
     x_distance = abs(x1 - x2)
@@ -89,7 +89,6 @@ def jump(current, direction, grid, draw):
 
     next_row = current.row + drow
     next_col = current.col + dcol
-
     # Jos olet reunan ulkopolella tai seinässä, lähde heti
     if not (0 <= next_row < rows and 0 <= next_col < cols):
         return None, 0, []
@@ -101,16 +100,16 @@ def jump(current, direction, grid, draw):
     while True:
         # Nosta liikkeen maksua. +1 kardinaalista ja +1.414... viistosta
         distance += 1.41421356237 if (drow != 0 and dcol != 0) else 1.0
-
-        draw()
         # Viistoliike päättyy tähän jos molemmat sen suunnan edessä olevat on barrier
         # Tämä siksi, että JP:t pitää olla saavutettavissa kardinaaliliikkein, ei siis
         # Viistohyppyjä seinien läpi
+        """
         if drow != 0 and dcol != 0:
-            vertical_clear = is_walkable(grid, next_row + drow, next_row)
-            horizontal_clear = is_walkable(grid, next_col, next_col + dcol)
+            vertical_clear = is_walkable(grid, next_row + drow, next_col)
+            horizontal_clear = is_walkable(grid, next_row, next_col + dcol)
             if not vertical_clear and not horizontal_clear:
                 return None, 0, []
+        """
         # Jos olet maalissa, palaa
         if next_node.is_end():
             return next_node, distance, []
@@ -126,15 +125,16 @@ def jump(current, direction, grid, draw):
             r, c = next_node.row, next_node.col
 
             # Viisto
-            if (not is_walkable(grid, r - drow, c)
-                and is_walkable(grid, r - drow, c + dcol)
-                and is_walkable(grid, r, c + dcol)):
-                forced_dirs.append((-drow, dcol))
+            if drow != 0 and dcol != 0:
+                if (not is_walkable(grid, r - drow, c)
+                    and is_walkable(grid, r - drow, c + dcol)
+                    and is_walkable(grid, r, c + dcol)):
+                    forced_dirs.append((-drow, dcol))
 
-            if (not is_walkable(grid, r, c - dcol)
-                and is_walkable(grid, r + drow, c - dcol)
-                and is_walkable(grid, r + drow, c)):
-                forced_dirs.append((drow, -dcol))
+                if (not is_walkable(grid, r, c - dcol)
+                    and is_walkable(grid, r + drow, c - dcol)
+                    and is_walkable(grid, r + drow, c)):
+                    forced_dirs.append((drow, -dcol))
 
             # Horisontaali liike
             elif drow == 0 and dcol != 0:
@@ -192,11 +192,13 @@ def jump(current, direction, grid, draw):
             return None, 0, []
         # Tai jos tämä olisi laiton viisto-hyppy seinien läpi
         if drow != 0 and dcol != 0:
-            neighbor1 = grid[next_row+drow][next_col]
-            neighbor2 = grid[next_row][next_col + dcol]
-            if neighbor1.is_barrier() and neighbor2.is_barrier():
-                return None, 0, []
-
+            try:
+                neighbor1 = grid[next_row+drow][next_col]
+                neighbor2 = grid[next_row][next_col + dcol]
+                if neighbor1.is_barrier() and neighbor2.is_barrier():
+                    return None, 0, []
+            except:
+                    pass
 def algorithm(draw, grid, start, end):
     start_time = time.time()
     count = 0
@@ -221,7 +223,7 @@ def algorithm(draw, grid, start, end):
             reconstruct_path(came_from, end, draw)
             end.make_end()
             end_time = time.time()
-            print(f"Resolved in {end_time - start_time} seconds")
+            print(f"Resolved JPS in {end_time - start_time} seconds")
             return True
 
         if current in came_from:
@@ -252,7 +254,7 @@ def algorithm(draw, grid, start, end):
                 reconstruct_path(came_from, end, draw)
                 end.make_end()
                 end_time = time.time()
-                print(f"Resolved in {end_time - start_time} seconds")
+                print(f"Resolved JPS in {end_time - start_time} seconds")
                 return True
             # Jos JP ei ollut end
             elif jump_point is not None:

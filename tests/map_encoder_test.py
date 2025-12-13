@@ -36,8 +36,8 @@ def test_pixel_reader_direct(tmp_path):
     create_test_image(img_path, size=(3,2), black_pixels=[(1,0), (2,1)])
     result = map_encoder.pixel_reader(str(img_path))
     assert result[0] == (3, 2)
-    assert (1, 0) in result
-    assert (2, 1) in result
+    assert (0, 1) in result
+    assert (1, 2) in result
 
 
 def test_main_creates_csv_when_missing(tmp_path, monkeypatch):

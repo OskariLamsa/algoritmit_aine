@@ -1,5 +1,6 @@
 import pygame
 from time import sleep
+import sys
 
 # Colors
 RED = (255, 0, 0)
@@ -129,7 +130,8 @@ class Spot:
 
 
 class Visualizer:
-    def __init__(self, width=800, rows=50, caption="No name given.", map_data=None):
+    def __init__(self, width=800, rows=50, caption="No name given.",
+                map_data=None, start_pos = None, end_pos = None):
         if map_data == None:
             self.rows = rows
         else:
@@ -141,11 +143,19 @@ class Visualizer:
 
         self.grid = self.make_grid(self.rows, width)
         self.start = None
+        self._dirty_rects = set()
+        if start_pos:
+            r, c = start_pos
+            self.start = self.grid[r][c]
+            self.start.make_start()
         self.end = None
+        if end_pos:
+            r, c = end_pos
+            self.end = self.grid[r][c]
+            self.end.make_end()
 
         self.background = pygame.Surface((width, width)).convert()
         self._render_background()
-        self._dirty_rects = set()
         self._initial_drawn = False
         if map_data is not None:
             self._draw_map_barriers(map_data)
@@ -268,13 +278,83 @@ class Visualizer:
                         self.reset_grid()
 
         pygame.quit()
+    def edit_loop(self):
+        """User edits the map and chooses start/end."""
+        run = True
+        clock = pygame.time.Clock()
 
+        while run:
+            clock.tick(120)
+            self.draw()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    return False
+
+                if pygame.mouse.get_pressed()[0]:
+                    row, col = self.get_clicked_pos(pygame.mouse.get_pos())
+                    if 0 <= row < self.rows and 0 <= col < self.rows:
+                        spot = self.grid[row][col]
+                        if not self.start:
+                            self.start = spot
+                            spot.make_start()
+                        elif not self.end and spot != self.start:
+                            self.end = spot
+                            spot.make_end()
+                        elif spot not in (self.start, self.end):
+                            spot.make_barrier()
+
+                elif pygame.mouse.get_pressed()[2]:
+                    row, col = self.get_clicked_pos(pygame.mouse.get_pos())
+                    if 0 <= row < self.rows and 0 <= col < self.rows:
+                        spot = self.grid[row][col]
+                        spot.reset()
+                        if spot == self.start:
+                            self.start = None
+                        elif spot == self.end:
+                            self.end = None
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE and self.start and self.end:
+                        return True   # setup done
+                    if event.key == pygame.K_c:
+                        self.reset_grid()
+    def run_algorithm(self, algorithm_callable):
+        self._update_all_neighbors()
+        return algorithm_callable(lambda: self.draw(), self.grid, self.start, self.end)
+
+    def snapshot_grid(self):
+        return [[spot.color for spot in row] for row in self.grid]
+    
+    def restore_grid(self, snapshot):
+        for i in range(self.rows):
+            for j in range(self.rows):
+                self.grid[i][j].color = snapshot[i][j]
+        self._initial_drawn = False
+        self._dirty_rects.clear()
 
 if __name__ == "__main__":
-    try:
-        from astar import algorithm
-    except Exception:
-        algorithm = lambda draw, grid, start, end: None
+    from map_loader import map_loader
+    map_data = None
+    if len(sys.argv) < 2:
+        print("Called visualizer without a map file. Defaulting to empty map.")
+        custom_rows = int(input("How big would you like the grid to be? "))
+        v = Visualizer(width=1100, rows=custom_rows, caption="a*", map_data=map_data)
+    else:
+        print("Called visualizer with map_data" \
+        "")
+        map_data = sys.argv[1]
+        map_data = map_loader(map_data)
+        v = Visualizer(width=1100, rows=250, caption="Full demo", map_data = map_data)
+    from algorithms.astar import algorithm
 
-    v = Visualizer(width=800, rows=250, caption="Incremental Visualizer Demo")
-    v.run(algorithm)
+    if v.edit_loop():
+        base = v.snapshot_grid()
+
+        from algorithms.astar import algorithm as astar
+        from algorithms.jps import algorithm as jps
+        for algo in (astar, jps):
+            v.restore_grid(base)
+            v.run_algorithm(algo)
+            sleep(3)

@@ -49,7 +49,7 @@ def pixel_reader(file_path):
         for j in range(width):
             r, g, b = pixels[j, i]
             if (r, g, b) == (0,0,0):
-                black_pixels_array.append((j,i))
+                black_pixels_array.append((i,j))
     return black_pixels_array
 
 

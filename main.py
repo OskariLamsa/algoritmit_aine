@@ -29,10 +29,11 @@ def main():
     print("Available algorithms:")
     for i in algorithms:
         print(f" - {i}")
+    print(" - all")
 
     algo_choice = input("\nWhich algorithm do you want to run? ")
 
-    if algo_choice not in algorithms:
+    if algo_choice not in algorithms and algo_choice != "all":
         print(f"Error: '{algo_choice}' is not a valid algorithm.")
         return
 
@@ -42,14 +43,25 @@ def main():
 
     print("Which map do you want to choose? ")
     map_choice = input(f"You can also type \"custom\" to draw your own map. ")
-    if map_choice == "custom":
+    if algo_choice == "all":
+        if map_choice == "custom":
+            runpy.run_module(f"visualizer", run_name="__main__")
+            return
+        if map_choice not in maps:
+            print(f"Error. {map_choice} is not a valid map name.")
+            return
+        sys.argv = ["", map_choice + ".csv"]
+        runpy.run_module(f"visualizer", run_name="__main__")
+        return
+   
+    elif map_choice == "custom":
         runpy.run_module(f"algorithms.{algo_choice}", run_name="__main__")
-    if map_choice not in maps:
+    elif map_choice in maps: 
+        sys.argv = ["", map_choice + ".csv"]
+        runpy.run_module(f"algorithms.{algo_choice}", run_name="__main__")
+    else:    
         print(f"Error. {map_choice} is not a valid map name.")
         return
-    sys.argv = ["", map_choice + ".csv"]
-    runpy.run_module(f"algorithms.{algo_choice}", run_name="__main__")
-
 
 if __name__ == "__main__":
     main()

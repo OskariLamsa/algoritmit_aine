@@ -40,7 +40,7 @@ def algorithm(draw, grid, start, end):
             reconstruct_path(came_from, end, draw)
             end.make_end()
             end_time = time.time()
-            print(f"Resolved in {end_time - start_time} seconds")
+            print(f"Resolved A* in {end_time - start_time} seconds")
             return True
 
         for neighbor in current.neighbors:
@@ -73,11 +73,10 @@ if __name__ == "__main__":
         print("Called astar without a map file. Defaulting to empty map.")
         custom_rows = int(input("How big would you like the grid to be? "))
         v = Visualizer(width=1100, rows=custom_rows, caption="a*", map_data=map_data)
-        v.run(algorithm)
     else:
         print("Called astar with map_data" \
         "")
         map_data = sys.argv[1]
         map_data = map_loader(map_data)
         v = Visualizer(width=1100, rows=250, caption="a*", map_data=map_data)
-        v.run(algorithm)
+    v.run(algorithm)
