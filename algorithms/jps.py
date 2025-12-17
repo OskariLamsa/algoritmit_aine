@@ -288,7 +288,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Called jps without a map file. Defaulting to empty map.")
         custom_rows = int(input("How big would you like the grid to be? "))
-        v = Visualizer(width=1100, rows=custom_rows, caption="JPS", map_data=map_data)
+        v = Visualizer(width=800, rows=custom_rows, caption="JPS", map_data=map_data)
         v.run(algorithm)
     else:
         print("Called jps with map_data" \

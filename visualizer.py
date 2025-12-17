@@ -340,7 +340,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Called visualizer without a map file. Defaulting to empty map.")
         custom_rows = int(input("How big would you like the grid to be? "))
-        v = Visualizer(width=1100, rows=custom_rows, caption="a*", map_data=map_data)
+        v = Visualizer(width=800, rows=custom_rows, caption="a*", map_data=map_data)
     else:
         print("Called visualizer with map_data" \
         "")
