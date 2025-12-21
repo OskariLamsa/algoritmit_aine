@@ -2,18 +2,29 @@ from queue import PriorityQueue
 import time
 from math import sqrt
 
+def move_cost(a, b):
+    x1, y1 = a.get_pos()
+    x2, y2 = b.get_pos()
+
+    # viisto liike = 1.41421356237
+    if x1 != x2 and y1 != y2:
+        return sqrt(2)
+    # kardinaali liike = 1
+    return 1
+
 def h(p1, p2):
-    #Manhattan distance -tyylinen heuristiikka
+    #Octile distance heuristiikka
     x1, y1 = p1
     x2, y2 = p2
-    return abs(x1 - x2) + abs(y1 - y2)
-
+    x_distance = abs(x1 - x2)
+    y_distance = abs(y1 - y2)
+    return max(x_distance,y_distance) + (0.414)*min(x_distance, y_distance)
 
 def reconstruct_path(came_from, current, draw):
     while current in came_from:
         current = came_from[current]
         current.make_path()
-        draw()
+    draw()
 
 
 def algorithm(draw, grid, start, end):
@@ -40,17 +51,16 @@ def algorithm(draw, grid, start, end):
             reconstruct_path(came_from, end, draw)
             end.make_end()
             end_time = time.time()
-            print(f"Resolved A* in {end_time - start_time} seconds")
-            return True
+            return (end_time - start_time, f_score[end])
 
         for neighbor in current.neighbors:
-            temp_g_score = g_score[current] + 1
+            temp_g_score = g_score[current] + move_cost(current, neighbor)
 
             if temp_g_score < g_score[neighbor]:
                 came_from[neighbor] = current
                 g_score[neighbor] = temp_g_score
                 f_score[neighbor] = temp_g_score + h(neighbor.get_pos(), end.get_pos())
-                if neighbor not in open_set_hash:
+                if neighbor not in open_set_hash and neighbor.color != (255, 0, 0):
                     count += 1
                     open_set.put((f_score[neighbor], count, neighbor))
                     open_set_hash.add(neighbor)
@@ -60,8 +70,7 @@ def algorithm(draw, grid, start, end):
 
         if current != start:
             current.make_closed()
-
-    return False
+    return ("No path was found", "")
 
 
 if __name__ == "__main__":
@@ -78,5 +87,9 @@ if __name__ == "__main__":
         "")
         map_data = sys.argv[1]
         map_data = map_loader(map_data)
-        v = Visualizer(width=1100, rows=250, caption="a*", map_data=map_data)
-    v.run(algorithm)
+        v = Visualizer(width=1100, rows=250, caption="a*", map_data=map_data, start_pos = (21, 812), end_pos =(607,267))
+    if v.edit_loop():
+        resolution_time, distance = v.run_algorithm(algorithm)
+    #    resolution_time, distance = v.run(algorithm)  
+        print(f"Resolved A* in {resolution_time} seconds")
+        print(f"Distance: {distance}")

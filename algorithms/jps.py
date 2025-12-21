@@ -65,7 +65,7 @@ def reconstruct_path(came_from, current, draw):
         parent = parent_entry[0]
         current = parent
         current.make_path()
-        draw()
+    draw()
 def get_pruned_directions(parent_dir):
     drow, dcol = parent_dir
     
@@ -82,7 +82,6 @@ def jump(current, direction, grid, draw):
     - forced_dirs on lista suuntia, jotka on tulevaisuudessa tutkittava pakotettujen naapurien takia
       Ne lisätään pää-algoritmissa kyseisen noden forced-listaan.
     """
-    draw()
     drow, dcol = direction
     rows = len(grid)
     cols = len(grid[0]) if rows else 0
@@ -96,24 +95,29 @@ def jump(current, direction, grid, draw):
     if next_node.is_barrier():
         return None, 0, []
     distance = 0.0
-
+    # Viistoliike päättyy tähän jos molemmat sen suunnan edessä olevat on barrier
+    # Tämä siksi, että JP:t pitää olla saavutettavissa kardinaaliliikkein, ei siis
+    # Viistohyppyjä seinien läpi
+    if drow != 0 and dcol != 0: 
+        vertical_clear = True
+        horizontal_clear = True
+        
+        # Tarkista vain jos koordinaatit ovat gridin sisällä
+        if 0 <= next_row < rows and 0 <= next_col < cols:
+            vertical_clear = is_walkable(grid, current.row, next_col)
+        if 0 <= next_row < rows and 0 <= next_col < cols:
+            horizontal_clear = is_walkable(grid, next_row, current.col)
+        
+        # Jos molemmat suunnat ovat blokattuja (tai gridin ulkopuolella), pysäytä
+        if not vertical_clear and not horizontal_clear:
+            return None, 0, []
     while True:
         # Nosta liikkeen maksua. +1 kardinaalista ja +1.414... viistosta
         distance += 1.41421356237 if (drow != 0 and dcol != 0) else 1.0
-        # Viistoliike päättyy tähän jos molemmat sen suunnan edessä olevat on barrier
-        # Tämä siksi, että JP:t pitää olla saavutettavissa kardinaaliliikkein, ei siis
-        # Viistohyppyjä seinien läpi
-        """
-        if drow != 0 and dcol != 0:
-            vertical_clear = is_walkable(grid, next_row + drow, next_col)
-            horizontal_clear = is_walkable(grid, next_row, next_col + dcol)
-            if not vertical_clear and not horizontal_clear:
-                return None, 0, []
-        """
+
         # Jos olet maalissa, palaa
         if next_node.is_end():
             return next_node, distance, []
-
         # Merkataan harmaaksi visualisoinnin vuoksi
         if next_node.is_empty():
             next_node.make_jump()
@@ -193,8 +197,8 @@ def jump(current, direction, grid, draw):
         # Tai jos tämä olisi laiton viisto-hyppy seinien läpi
         if drow != 0 and dcol != 0:
             try:
-                neighbor1 = grid[next_row+drow][next_col]
-                neighbor2 = grid[next_row][next_col + dcol]
+                neighbor1 = grid[next_row-(drow)][next_col]
+                neighbor2 = grid[next_row][next_col-(dcol)]
                 if neighbor1.is_barrier() and neighbor2.is_barrier():
                     return None, 0, []
             except:
@@ -223,9 +227,7 @@ def algorithm(draw, grid, start, end):
             reconstruct_path(came_from, end, draw)
             end.make_end()
             end_time = time.time()
-            print(f"Resolved JPS in {end_time - start_time} seconds")
-            return True
-
+            return(end_time - start_time, f_score[end])
         if current in came_from:
             parent_dir = came_from[current][1]
             if parent_dir is None:
@@ -247,24 +249,23 @@ def algorithm(draw, grid, start, end):
         for direction in valid_directions:
             # Hyppy
             jump_point, jump_distance, forced_dirs = jump(current, direction, grid, draw)
-            # Seuraava if-lause pysäyttää suuntien laskennan jos löysit endin
-            if jump_point is not None and jump_point == end:
-                # Laita sanakirjaan tieto siitä, mistä nodesta siihen päästiin, suunta, ja forced_dir
-                came_from[jump_point] = (current, direction, forced_dirs)
-                reconstruct_path(came_from, end, draw)
-                end.make_end()
-                end_time = time.time()
-                print(f"Resolved JPS in {end_time - start_time} seconds")
-                return True
             # Jos JP ei ollut end
-            elif jump_point is not None:
+            if jump_point is not None:
                 temp_g_score = g_score[current] + jump_distance
                 if temp_g_score < g_score[jump_point]:
                     # Laita sanakirjaan tieto siitä, mistä nodesta siihen päästiin, suunta, ja forced_dir
                     came_from[jump_point] = (current, direction, forced_dirs)
                     g_score[jump_point] = temp_g_score
                     f_score[jump_point] = temp_g_score + h(jump_point.get_pos(), end.get_pos())
-                    if jump_point not in open_set_hash:
+                    # Seuraava if-lause pysäyttää suuntien laskennan jos löysit endin
+                    if jump_point == end:
+                        # Laita sanakirjaan tieto siitä, mistä nodesta siihen päästiin, suunta, ja forced_dir
+                        came_from[jump_point] = (current, direction, forced_dirs)
+                        reconstruct_path(came_from, end, draw)
+                        end.make_end()
+                        end_time = time.time()
+                        return (end_time - start_time, f_score[end])
+                    elif jump_point not in open_set_hash:
                         count += 1
                         open_set.put((f_score[jump_point], count, jump_point))
                         open_set_hash.add(jump_point)
@@ -272,11 +273,11 @@ def algorithm(draw, grid, start, end):
 
 
             draw()
-            #time.sleep(0.2)
+            #time.sleep(0.1)
         if current != start:
             current.make_closed()
 
-    return False
+    return ("No path was found", "")
 
 
 
@@ -289,11 +290,13 @@ if __name__ == "__main__":
         print("Called jps without a map file. Defaulting to empty map.")
         custom_rows = int(input("How big would you like the grid to be? "))
         v = Visualizer(width=800, rows=custom_rows, caption="JPS", map_data=map_data)
-        v.run(algorithm)
     else:
         print("Called jps with map_data" \
         "")
         map_data = sys.argv[1]
         map_data = map_loader(map_data)
-        v = Visualizer(width=1100, rows=250, caption="JPS", map_data=map_data)
-        v.run(algorithm)
+        v = Visualizer(width=1100, rows=250, caption="a*", map_data=map_data, start_pos = (21, 812), end_pos = (607,267))
+    if v.edit_loop():
+        return_time, distance = v.run_algorithm(algorithm)
+        print(f"Resolved JPS in {return_time} seconds")
+        print(f"Distance: {distance}")

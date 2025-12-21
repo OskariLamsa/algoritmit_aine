@@ -243,7 +243,7 @@ class Visualizer:
             for spot in row:
                 spot.update_neighbors(self.grid)
     #Poista tämä ennen loppupalautusta
-    
+    """
     def run(self, algorithm_callable):
         run = True
         clock = pygame.time.Clock()
@@ -290,7 +290,7 @@ class Visualizer:
                         self.reset_grid()
         pygame.quit()
         return return_tuple
-    
+    """
     def edit_loop(self):
         """User edits the map and chooses start/end."""
         run = True

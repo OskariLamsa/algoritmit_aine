@@ -20,7 +20,7 @@ def list_maps():
         f[:-4] for f in files
         if f.endswith(".csv")
     ]
-    return maps
+    return sorted(maps)
 
 
 def main():
