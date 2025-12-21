@@ -1,4 +1,4 @@
-# Loppu Raportti
+# Loppuraportti
 
 Tämän kurssin aikana opiskelin polunetsijä-algoritmien historiaa, ja koodasin kaksi hyvin suosittua polunetsijä algoritmia, A* ja JPS. Lisäksi testasin eroja niiden suorituksen nopeudessa.
 Aloitin A* toteutuksesta ja käytin pygame-kirjastoa polunetsijoiden visualisointiin. Sitten tein skriptit map_encoder ja map_loader, joilla voi muuttaa karttakuvat csv -tiedostoiksi, ja sitten käyttää näitä tiedostoja poluissa.
@@ -30,3 +30,4 @@ Tällä kartalla Astar ja JPS ovat suunnilleen yhtä nopeita. Huomattavaa on jum
 Pytestillä suoritetut testit menevät kaikki läpi. Niissä testataan apuskriptejä, ja apufunktioita algoritmien sisällä. Mutta kiinnostavin niistä on algo_function_test, jossa testaamme, että Astar ja JPS toimivat oikein. Piirisin test_cardinals ja test_diagonals kartat, joissa testataan monipuolisesti algoritmien kykyä laskea optimaalinen reitti. Varmistaakseni, että orientaatiolla ei ole väliä, niin noista kartoista on saatavilla käännetyt versiot, 90, 180, ja 270 asteen kulmissa. Ajetaan siis kartta molemmilla algoritmeilla, ja kaikilla kartan orientaatioilla, ja varmistetaan, että niistä saadaan täysin sama optimaalinen polun pituus, jonka olen käsin laskenut.
 Lisäksi testasin satunnaisesti algoritmien suoritusta isommilla kartoilla, jotka on saatavilla osoitteesta https://www.movingai.com/benchmarks/street/index.html
 Minulla oli 30 karttaa, joten ajoin jokaisella kartalla 3 testiä per algoritmi, joten yhteensä 90 polkua molemmilla algoritmeilla. Varmistin myos, että valitsemme sellaiset aloitus- ja lopetuspisteet, että polun pituus on vähintään 500 pikseliä. Tämä testidata loytyy dokumentaatiokansiosta. Molemmat algoritmit palauttivat täysin yhtä pitkän polun, ja JPS oli joka kerralla nopeampi, joka oli odotettavissa.
+Keskimäärin JPS oli 12.33 kertaa nopeampi kuin Astar.
