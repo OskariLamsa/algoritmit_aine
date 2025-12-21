@@ -17,5 +17,9 @@ Tässä on esimerkki:
 
 ### JPS
 JPS:n vahvuus on sen hypyissä. Mikäli kartta on sellainen, jossa JPS kykenee hyppimään pitkiä matkoja ennen kuin se saapuu seinään tai forced neighboriin, niin se korvaa monta open-set operaatiota nopeilla tarkistuksilla.
-On kyllä totta, että JPS usein hyppii suuntiin, jotka eivät ole relevantteja. Esim aloitusnodesta kun lähdetään, meidän täytyy hypätä joka suuntaan, siinä missä A* lähtee liikkeelle välittomästi kohti maalin suuntaa sen heuristiikan mielestä.
-Toisaalta juuri tämä 
+On kyllä totta, että JPS usein hyppii suuntiin, jotka eivät ole relevantteja. Esim aloitusnodesta kun lähdetään, meidän täytyy hypätä joka suuntaan, siinä missä A* lähtee liikkeelle välittomästi kohti maalin suuntaa sen heuristiikan mielestä, niin JPS sen sääntojen perusteella täytyy hypätä "turhiin" suuntiin jotka eivät ehkä ole lainkaan optimaalisen polun suunnassa. Lisäksi on mahdollista saavuttaa karttakoko, jolloin tyhjää tilaa niin paljon, että hypyt ovat esim 100000 nodea pitkiä, joka hidastaa algoritmia.
+Kuitenkin nuo ovat melko teoreettisia huolia. Yleensä polunetsijäalgoritmeja ajetaan järkevillä kartoilla, jotka eivät ole niin isoja, että hypyt olisivat haitaksi.
+Ylhäällä oleva kuva on todella hyvä esimerkki kartasta, jossa JPS:n teho käy ilmi, mutta voimme viedä tämän vielä pitemmälle seuraavassa testissä:
+![JPS_good_example](https://i.imgur.com/EaXbP1r.png)
+Tässä kartassa esteet ovat kovin neliskanttisia. Ne siis hädin tuskin tuottavat yhtään jump pointteja, joten tämä tilanne on JPSlle todella optimaalinen. Esteiden tiheyden ja sahalaitaisuuden kasvaessa algoritmi hidastuu.
+Alhaalla esimerkki tästä:
