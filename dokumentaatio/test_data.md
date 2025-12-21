@@ -1,4 +1,4 @@
-| Map name  | Start node | End node | A* time | JPS time | A* distance | JPS distance | Speedup (A* / JPS) |
+| Kartta  | Aloitus node | Lopetus Node | A* aika| JPS aika | A* matka | JPS matka | Nopeusero (A* / JPS) |
 |-----------|------------|----------|---------|----------|-------------|--------------|-------------------|
 | Berlin_0  | 937,570    | 268,153  | 19.991  | 2.231    | 841.727     | 841.727      | 8.96×  |
 | Berlin_0  | 1028,588   | 178,962  | 74.455  | 2.892    | 1075.332    | 1075.332     | 25.75× |
