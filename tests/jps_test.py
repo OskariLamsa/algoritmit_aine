@@ -9,11 +9,11 @@ def test_heuristic():
 def test_algorithm():
     # Käytetään 3x3 testikarttaa, joka on annettu map_data muodossa eli listana.
     v = Visualizer(width = 1100, rows=3, caption="testing", map_data=[(3,3),(0,0),(0,1),(2,1),(2,2),], start_pos = (2,0), end_pos = (0,2))
-    assert v.run_algorithm(algorithms.jps.algorithm) == True
+    assert v.run_algorithm(algorithms.jps.algorithm) != ("No path was found", "")
 def test_algorithm_impossible_map():
     # Sama kuin aiemmin, mutta tukitaan tahallaan tie, että algo ei onnistu.
     v = Visualizer(width = 1100, rows=3, caption="testing", map_data=[(3,3),(0,0),(0,1),(1,1),(2,1),(2,2),], start_pos = (2,0), end_pos = (0,2))
-    assert v.run_algorithm(algorithms.jps.algorithm) == False
+    assert v.run_algorithm(algorithms.jps.algorithm) == ("No path was found", "")
 def test_is_walkable():
     # Tehdään grid-olio, jossa on yksi valkoinen ja yksi musta pikseli, ja testataan,
     # Ovatko ne odotetusti "käveltäviä" tai ei
@@ -224,7 +224,7 @@ def test_jump_into_end():
     def draw():
         pass
     new_spot = Spot(0,0,250,250)
-    end_spot = Spot(1,0,250,250)
+    end_spot = Spot(0,1,250,250)
     silly_spot = Spot(1,0,250,250)
     funny_spot = Spot(1,1,250,250)
     end_spot.make_end()
@@ -233,4 +233,4 @@ def test_jump_into_end():
     grid[1].append(end_spot)
     grid[0].append(silly_spot)
     grid[1].append(funny_spot)
-    assert algorithms.jps.jump(new_spot, (0,1), grid, draw) == (None, 1, [])
+    assert algorithms.jps.jump(new_spot, (0,1), grid, draw) == (None, 0, [])

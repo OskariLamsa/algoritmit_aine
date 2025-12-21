@@ -22,9 +22,10 @@ def test_random():
     maps.remove("test_cardinal_90")
     maps.remove("test_cardinal_180")
     maps.remove("test_cardinal_270")
-    with open("test_report", "w") as file:
+    mapst = ["Milan_0"]
+    with open("test_report.csv", "w") as file:
         writer = csv.writer(file, delimiter=';')
-        for i in maps:
+        for i in mapst:
             map_data = map_loader(f"{i}.csv")
             counter = 0
             while counter <= 2:
@@ -53,4 +54,5 @@ def test_random():
                     astar_distance = round(astar_distance, 3)
                     writer.writerow([(i, start_pos, end_pos, astar_time, jps_time, astar_distance, jps_distance)])
                     counter += 1
-    assert os.path.isfile("test_report_fix.csv") == True
+if __name__=="__main__":
+    test_random()

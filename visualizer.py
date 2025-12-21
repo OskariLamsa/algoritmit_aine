@@ -369,5 +369,7 @@ if __name__ == "__main__":
         from algorithms.jps import algorithm as jps
         for algo in (astar, jps):
             v.restore_grid(base)
-            v.run_algorithm(algo)
+            time, distance = v.run_algorithm(algo)
+            print(f"Resolved {algo} in {time} seconds.")
+            print(distance)
             sleep(3)
